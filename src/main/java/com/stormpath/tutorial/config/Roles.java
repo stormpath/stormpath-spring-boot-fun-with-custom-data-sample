@@ -19,15 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-/**
- * @since 1.0.RC5
- */
 @Component
 public class Roles {
-    public final String AUTHORIZED_USER;
+    public final String GROUP_USER;
+    public final String GROUP_ADMIN;
 
     @Autowired
     public Roles(Environment env) {
-        AUTHORIZED_USER = env.getProperty("stormpath.authorized.group.user");
+        GROUP_USER = env.getProperty("stormpath.authorized.group.user");
+        GROUP_ADMIN = env.getProperty("stormpath.authorized.group.admin");
     }
 }

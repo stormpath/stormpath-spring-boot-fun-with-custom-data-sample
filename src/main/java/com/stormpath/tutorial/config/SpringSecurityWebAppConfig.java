@@ -18,10 +18,6 @@ package com.stormpath.tutorial.config;
 import com.stormpath.spring.config.StormpathWebSecurityConfigurerAdapter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-
-/**
- * @since 1.0.RC5
- */
 @Configuration
 public class SpringSecurityWebAppConfig extends StormpathWebSecurityConfigurerAdapter {
     @Override
@@ -30,6 +26,7 @@ public class SpringSecurityWebAppConfig extends StormpathWebSecurityConfigurerAd
             .authorizeRequests()
             .antMatchers("/restricted").fullyAuthenticated()
             .antMatchers("/new_book").fullyAuthenticated()
+            .antMatchers("/upvote").fullyAuthenticated()
             .antMatchers("/**").permitAll();
     }
 }

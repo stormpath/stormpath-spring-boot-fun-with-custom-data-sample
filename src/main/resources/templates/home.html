@@ -13,14 +13,14 @@
 ~ See the License for the specific language governing permissions and
 ~ limitations under the License.
 */-->
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
         <!--/*/ <th:block th:include="fragments/head :: head"/> /*/-->
     </head>
     <body>
         <div class="container-fluid">
             <div class="row">
-                <div class="box col-md-6 col-md-offset-3">
+                <div class="box col-md-9">
                     <div class="stormpath-header">
                         <img src="https://stormpath.com/images/template/logo-nav.png"/>
                     </div>
@@ -30,23 +30,34 @@
                         <p th:utext="#{'stormpath.web.login.status.' + ${status}}">|Login Status|</p>
                     </div>
 
-                    <div th:if="${books}">
+                    <!--/* Always show the book list, if available */-->
+                    <div th:if="${#lists.size(bookData)}">
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th class="col-md-1">Votes</th>
-                                    <th class="col-md-1">Author</th>
+                                    <th class="col-md-1 text-center">Up Vote</th>
+                                    <th class="col-md-1 text-center">Votes</th>
+                                    <th class="col-md-3">Author</th>
                                     <th class="col-md-4">Book</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="book : ${books}">
-                                    <td th:text="${book.votes}"/>
-                                    <td th:text="${book.author}"/>
-                                    <td th:if="${book.url}">
-                                        <a th:href="${book.url}" th:text="${book.title}" target="_blank"/>
+                                <tr th:each="bookDatum : ${bookData}">
+                                    <td class="text-center" th:if="${bookDatum.canUpVote}">
+                                        <form class="stormpath-hidden-form" th:action="@{/upvote}" method="post">
+                                            <input name="author" th:value="${bookDatum.book.author}" type="hidden"/>
+                                            <input name="title" th:value="${bookDatum.book.title}" type="hidden"/>
+                                            <input name="url" th:value="${bookDatum.book.url}" type="hidden"/>
+                                            <a href="#" onclick="$(this).closest('form').submit()"><i class="fa fa-arrow-up"></i></a>
+                                        </form>
                                     </td>
-                                    <td th:unless="${book.url}" th:text="${book.title}"/>
+                                    <td class="text-center" th:unless="${bookDatum.canUpVote}">&nbsp;</td>
+                                    <td class="text-center" th:text="${bookDatum.book.votes}"/>
+                                    <td th:text="${bookDatum.book.author}"/>
+                                    <td th:if="${bookDatum.book.url}">
+                                        <a th:href="${bookDatum.book.url}" th:text="${bookDatum.book.title}" target="_blank"/>
+                                    </td>
+                                    <td th:unless="${bookDatum.book.url}" th:text="${bookDatum.book.title}"/>
                                 </tr>
                             </tbody>
                         </table>
@@ -54,7 +65,7 @@
 
                     <!--/* displayed if account IS NOT null, indicating that the user IS logged in */-->
                     <div th:if="${account}">
-                        <h1 th:inline="text">Hello, [[${account.givenName}]]!</h1>
+                        <h1 th:inline="text">Hello, [[${account.fullName}]]!</h1>
 
                         <form th:action="@{/new_book}" th:object="${book}" method="post" class="form-inline">
                             <div class="form-group">
@@ -72,7 +83,7 @@
                             <button type="submit" class="btn btn-success">New Book</button>
                         </form>
 
-                        <a href="/restricted" class="btn btn-primary">Restricted</a>
+                        <a th:href="@{/admin}" class="btn btn-primary">Admin</a>
                         <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
                     </div>
 

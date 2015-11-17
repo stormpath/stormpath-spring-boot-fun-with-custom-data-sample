@@ -18,6 +18,7 @@ package com.stormpath.tutorial.controller;
 import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.client.Client;
 import com.stormpath.sdk.directory.CustomData;
+import com.stormpath.sdk.lang.Collections;
 import com.stormpath.sdk.servlet.account.AccountResolver;
 import com.stormpath.sdk.servlet.client.ClientResolver;
 import com.stormpath.tutorial.model.Book;
@@ -31,10 +32,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-/**
- * @since 1.0.RC5
- */
 @Controller
 public class BooksController {
 
@@ -49,9 +51,25 @@ public class BooksController {
         model.addAttribute("status", req.getParameter("status"));
         model.addAttribute("book", new Book());
 
-        CustomData customData = getGroupCustomData(req);
-        if (customData != null) {
-            model.addAttribute("books", customData.get("books"));
+        Account account = AccountResolver.INSTANCE.getAccount(req);
+        List<Book> allBooks = getBooksFromGroupCustomData(req);
+        if (allBooks != null) {
+            List<Book> myBooks = getBooksFromAccountCustomData(req);
+            List<Map<String, Object>> bookData = new ArrayList<Map<String, Object>>();
+            for (Book book : allBooks) {
+                Map<String, Object> bookDatum = new HashMap<String, Object>();
+                bookData.add(bookDatum);
+                bookDatum.put("book", book);
+                if (
+                    account != null && account.isMemberOfGroup(userGroupHref) && !myBooks.contains(book)
+                ) {
+                    bookDatum.put("canUpVote", true);
+                } else {
+                    bookDatum.put("canUpVote", false);
+                }
+            }
+
+            model.addAttribute("bookData", bookData);
         }
 
         return "home";
@@ -64,13 +82,26 @@ public class BooksController {
         return "redirect:/";
     }
 
-    @RequestMapping("/restricted")
+    @RequestMapping(value="/upvote", method=RequestMethod.POST)
+    String upvote(HttpServletRequest req, @ModelAttribute Book book) {
+        bookService.upvote(getAccountCustomData(req), getGroupCustomData(req), book);
+
+        return "redirect:/";
+    }
+
+    @RequestMapping("/admin")
     String restricted(HttpServletRequest req, Model model) {
-//        String msg = bookService.sayHello(
-//            AccountResolver.INSTANCE.getAccount(req)
-//        );
-//        model.addAttribute("msg", msg);
-        return "restricted";
+        return "redirect:/";
+    }
+
+    private List<Book> getBooksFromGroupCustomData(HttpServletRequest req) {
+        CustomData customData = getGroupCustomData(req);
+        return bookService.getBooksFromCustomData(customData);
+    }
+
+    private List<Book> getBooksFromAccountCustomData(HttpServletRequest req) {
+        CustomData customData = getAccountCustomData(req);
+        return bookService.getBooksFromCustomData(customData);
     }
 
     private CustomData getGroupCustomData(HttpServletRequest req) {
@@ -81,6 +112,10 @@ public class BooksController {
     private CustomData getAccountCustomData(HttpServletRequest req) {
         Client client = ClientResolver.INSTANCE.getClient(req);
         Account account = AccountResolver.INSTANCE.getAccount(req);
-        return client.getResource(account.getCustomData().getHref(), CustomData.class);
+        CustomData customData = null;
+        if (account != null) {
+            customData = client.getResource(account.getCustomData().getHref(), CustomData.class);
+        }
+        return customData;
     }
 }

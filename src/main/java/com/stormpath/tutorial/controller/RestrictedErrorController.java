@@ -26,9 +26,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
-/**
- * @since 1.0.RC5
- */
 @Controller
 public class RestrictedErrorController implements ErrorController {
     private static final String ERROR_PATH = "/error";
@@ -36,7 +33,6 @@ public class RestrictedErrorController implements ErrorController {
     @Autowired
     private ErrorAttributes errorAttributes;
 
-    @Override
     public String getErrorPath() {
         return ERROR_PATH;
     }
