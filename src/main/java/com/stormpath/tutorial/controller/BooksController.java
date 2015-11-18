@@ -18,7 +18,6 @@ package com.stormpath.tutorial.controller;
 import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.client.Client;
 import com.stormpath.sdk.directory.CustomData;
-import com.stormpath.sdk.lang.Collections;
 import com.stormpath.sdk.servlet.account.AccountResolver;
 import com.stormpath.sdk.servlet.client.ClientResolver;
 import com.stormpath.tutorial.model.Book;
@@ -32,8 +31,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,29 +45,14 @@ public class BooksController {
 
     @RequestMapping("/")
     String home(HttpServletRequest req, Model model) {
-        model.addAttribute("status", req.getParameter("status"));
-        model.addAttribute("book", new Book());
-
         Account account = AccountResolver.INSTANCE.getAccount(req);
         List<Book> allBooks = getBooksFromGroupCustomData(req);
-        if (allBooks != null) {
-            List<Book> myBooks = getBooksFromAccountCustomData(req);
-            List<Map<String, Object>> bookData = new ArrayList<Map<String, Object>>();
-            for (Book book : allBooks) {
-                Map<String, Object> bookDatum = new HashMap<String, Object>();
-                bookData.add(bookDatum);
-                bookDatum.put("book", book);
-                if (
-                    account != null && account.isMemberOfGroup(userGroupHref) && !myBooks.contains(book)
-                ) {
-                    bookDatum.put("canUpVote", true);
-                } else {
-                    bookDatum.put("canUpVote", false);
-                }
-            }
+        List<Book> myBooks = getBooksFromAccountCustomData(req);
+        List<Map<String, Object>> bookData = bookService.getBookData(account, allBooks, myBooks);
 
-            model.addAttribute("bookData", bookData);
-        }
+        model.addAttribute("status", req.getParameter("status"));
+        model.addAttribute("book", new Book());
+        model.addAttribute("bookData", bookData);
 
         return "home";
     }

@@ -15,76 +15,100 @@
  */
 package com.stormpath.tutorial.service;
 
+import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.directory.CustomData;
 import com.stormpath.tutorial.model.Book;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Service
 public class BookService {
+    @Value("#{ @environment['stormpath.authorized.group.user'] }")
+    private String userGroupHref;
+
     @PreAuthorize("hasRole(@roles.GROUP_USER)")
     public void newBook(CustomData accountCustomData, CustomData groupCustomData, Book book) {
-        if (accountCustomData != null) {
-            List<Book> books = getBooksFromCustomData(accountCustomData);
-            if (books == null) {
-                books = new ArrayList<Book>();
-            } else if (books.contains(book)) {
-                return;
-            }
+        List<Book> books = getBooksFromCustomData(accountCustomData);
 
-            books.add(book);
-            accountCustomData.put("books", books);
-            accountCustomData.save();
-        }
+        // shouldn't add the same book; keys of case insensitive combo of author and title
+        if (books.contains(book)) { return; }
 
-        if (groupCustomData != null) {
-            book.setVotes(1);
-            List<Book> books = getBooksFromCustomData(groupCustomData);
-            if (books == null) {
-                books = new ArrayList<Book>();
-            }
-            books.add(book);
+        books.add(book);
+        accountCustomData.put("books", books);
+        accountCustomData.save();
+
+        books = getBooksFromCustomData(groupCustomData);
+        book.setVotes(1);
+        books.add(book);
+        groupCustomData.put("books", books);
+        groupCustomData.save();
+    }
+
+    @PreAuthorize("hasRole(@roles.GROUP_USER)")
+    public void upvote(CustomData accountCustomData, CustomData groupCustomData, Book book) {
+        List<Book> books = getBooksFromCustomData(accountCustomData);
+
+        // shouldn't get here if they've already upvoted
+        if (books.contains(book)) { return; }
+
+        books.add(book);
+        accountCustomData.put("books", books);
+        accountCustomData.save();
+
+        books = getBooksFromCustomData(groupCustomData);
+        int foundIndex = books.indexOf(book);
+        if (foundIndex >= 0) {
+            Book foundBook = books.get(foundIndex);
+            foundBook.setVotes(foundBook.getVotes()+1);
             groupCustomData.put("books", books);
             groupCustomData.save();
         }
     }
 
-    @PreAuthorize("hasRole(@roles.GROUP_USER)")
-    public void upvote(CustomData accountCustomData, CustomData groupCustomData, Book book) {
-        if (accountCustomData != null) {
-            List<Book> books = getBooksFromCustomData(accountCustomData);
-            if (books == null) {
-                books = new ArrayList<Book>();
-            } else if (books.contains(book)) {
-                return;
-            }
-            books.add(book);
-            accountCustomData.put("books", books);
-            accountCustomData.save();
-        }
-
-        if (groupCustomData != null) {
-            List<Book> books = getBooksFromCustomData(groupCustomData);
-            int foundIndex = books.indexOf(book);
-            if (foundIndex >= 0) {
-                Book foundBook = books.get(foundIndex);
-                foundBook.setVotes(foundBook.getVotes()+1);
-                groupCustomData.put("books", books);
-                groupCustomData.save();
+    public List<Map<String, Object>> getBookData(Account account, List<Book> allBooks, List<Book> myBooks) {
+        List<Map<String, Object>> bookData = new ArrayList<Map<String, Object>>();
+        if (allBooks != null) {
+            for (Book book : allBooks) {
+                Map<String, Object> bookDatum = new HashMap<String, Object>();
+                bookData.add(bookDatum);
+                bookDatum.put("book", book);
+                if (
+                    account != null && account.isMemberOfGroup(userGroupHref) &&
+                    myBooks != null && !myBooks.contains(book)
+                ) {
+                    bookDatum.put("canUpVote", true);
+                } else {
+                    bookDatum.put("canUpVote", false);
+                }
             }
         }
+        return bookData;
     }
 
     public List<Book> getBooksFromCustomData(CustomData customData) {
-        List<Book> books = new ArrayList<Book>();
-
         if (customData == null || customData.get("books") == null) {
             return new ArrayList<Book>();
         }
+
+        // order by votes, descending then title, ascending
+        Set<Book> books = new TreeSet<Book>(new Comparator<Book>() {
+            public int compare(Book b1, Book b2) {
+                if (b1.getVotes() == b2.getVotes()) {
+                    return b1.getTitle().compareTo(b2.getTitle());
+                } else {
+                    return b2.getVotes() - b1.getVotes();
+                }
+            }
+        });
 
         List<Map<String, Object>> booksList = (List<Map<String, Object>>) customData.get("books");
         if (booksList != null) {
@@ -100,6 +124,6 @@ public class BookService {
                 books.add(book);
             }
         }
-        return books;
+        return new ArrayList<Book>(books);
     }
 }
