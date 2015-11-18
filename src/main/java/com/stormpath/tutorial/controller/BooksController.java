@@ -21,6 +21,7 @@ import com.stormpath.sdk.directory.CustomData;
 import com.stormpath.sdk.servlet.account.AccountResolver;
 import com.stormpath.sdk.servlet.client.ClientResolver;
 import com.stormpath.tutorial.model.Book;
+import com.stormpath.tutorial.model.BookDatum;
 import com.stormpath.tutorial.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 public class BooksController {
@@ -48,7 +48,7 @@ public class BooksController {
         Account account = AccountResolver.INSTANCE.getAccount(req);
         List<Book> allBooks = getBooksFromGroupCustomData(req);
         List<Book> myBooks = getBooksFromAccountCustomData(req);
-        List<Map<String, Object>> bookData = bookService.getBookData(account, allBooks, myBooks);
+        List<BookDatum> bookData = bookService.getBookData(account, allBooks, myBooks);
 
         model.addAttribute("status", req.getParameter("status"));
         model.addAttribute("book", new Book());
@@ -71,6 +71,7 @@ public class BooksController {
         return "redirect:/";
     }
 
+    // not implemented yet
     @RequestMapping("/admin")
     String restricted(HttpServletRequest req, Model model) {
         return "redirect:/";

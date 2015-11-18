@@ -18,13 +18,13 @@ package com.stormpath.tutorial.service;
 import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.directory.CustomData;
 import com.stormpath.tutorial.model.Book;
+import com.stormpath.tutorial.model.BookDatum;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,21 +74,21 @@ public class BookService {
         }
     }
 
-    public List<Map<String, Object>> getBookData(Account account, List<Book> allBooks, List<Book> myBooks) {
-        List<Map<String, Object>> bookData = new ArrayList<Map<String, Object>>();
+    public List<BookDatum> getBookData(Account account, List<Book> allBooks, List<Book> myBooks) {
+        List<BookDatum> bookData = new ArrayList<BookDatum>();
         if (allBooks != null) {
             for (Book book : allBooks) {
-                Map<String, Object> bookDatum = new HashMap<String, Object>();
-                bookData.add(bookDatum);
-                bookDatum.put("book", book);
+                BookDatum bookDatum = new BookDatum();
+                bookDatum.setBook(book);
                 if (
                     account != null && account.isMemberOfGroup(userGroupHref) &&
                     myBooks != null && !myBooks.contains(book)
                 ) {
-                    bookDatum.put("canUpVote", true);
+                    bookDatum.setCanUpVote(true);
                 } else {
-                    bookDatum.put("canUpVote", false);
+                    bookDatum.setCanUpVote(false);
                 }
+                bookData.add(bookDatum);
             }
         }
         return bookData;
