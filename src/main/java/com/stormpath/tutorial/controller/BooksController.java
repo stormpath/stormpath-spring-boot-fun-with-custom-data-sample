@@ -73,7 +73,7 @@ public class BooksController {
 
     // not implemented yet
     @RequestMapping("/admin")
-    String restricted(HttpServletRequest req, Model model) {
+    String admin(HttpServletRequest req, Model model) {
         return "redirect:/";
     }
 
