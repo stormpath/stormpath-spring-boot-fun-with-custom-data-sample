@@ -35,6 +35,10 @@ public class BookService {
     @Value("#{ @environment['stormpath.authorized.group.user'] }")
     private String userGroupHref;
 
+    @Value("#{ @environment['stormpath.authorized.group.admin'] }")
+    private String adminGroupHref;
+
+
     @PreAuthorize("hasRole(@roles.GROUP_USER)")
     public void newBook(CustomData accountCustomData, CustomData groupCustomData, Book book) {
         List<Book> books = getBooksFromCustomData(accountCustomData);
@@ -72,6 +76,10 @@ public class BookService {
             groupCustomData.put("books", books);
             groupCustomData.save();
         }
+    }
+
+    public boolean isAdmin(Account account) {
+        return (account != null && account.isMemberOfGroup(adminGroupHref));
     }
 
     public List<BookDatum> getBookData(Account account, List<Book> allBooks, List<Book> myBooks) {

@@ -49,8 +49,10 @@ public class BooksController {
         List<Book> allBooks = getBooksFromGroupCustomData(req);
         List<Book> myBooks = getBooksFromAccountCustomData(req);
         List<BookDatum> bookData = bookService.getBookData(account, allBooks, myBooks);
+        boolean isAdmin = bookService.isAdmin(account);
 
         model.addAttribute("status", req.getParameter("status"));
+        model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("book", new Book());
         model.addAttribute("bookData", bookData);
 
