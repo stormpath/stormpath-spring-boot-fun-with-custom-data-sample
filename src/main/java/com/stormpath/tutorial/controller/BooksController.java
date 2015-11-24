@@ -68,6 +68,8 @@ public class BooksController {
 
     @RequestMapping(value="/new_book", method= RequestMethod.POST)
     String newBook(HttpServletRequest req, @ModelAttribute Book book) {
+        // server sets the owner; not left up to browser data
+        book.setOwner(AccountResolver.INSTANCE.getAccount(req).getFullName());
         bookService.newBook(getAccountCustomData(req), getGroupCustomData(req), book);
 
         return "redirect:/";

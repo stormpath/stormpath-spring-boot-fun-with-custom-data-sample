@@ -41,41 +41,53 @@ public class BookService {
 
     @PreAuthorize("hasRole(@roles.GROUP_USER)")
     public void newBook(CustomData accountCustomData, CustomData groupCustomData, Book book) {
-        List<Book> books = getBooksFromCustomData(accountCustomData);
+        List<Book> myBooks = getBooksFromCustomData(accountCustomData);
+        List<Book> groupBooks = getBooksFromCustomData(groupCustomData);
 
-        // shouldn't add the same book; keys of case insensitive combo of author and title
-        if (books.contains(book)) { return; }
+        // shouldn't add the same book; key is case insensitive combo of author and title
+        if (myBooks.contains(book)) { return; }
 
-        books.add(book);
-        accountCustomData.put("books", books);
-        accountCustomData.save();
-
-        books = getBooksFromCustomData(groupCustomData);
+        // save Group CustomData
         book.setVotes(1);
-        books.add(book);
-        groupCustomData.put("books", books);
+        groupBooks.add(book);
+        groupCustomData.put("books", groupBooks);
         groupCustomData.save();
+
+        // save Account CustomData
+        // votes are ignored at the account level, but let's keep it 0
+        book.setVotes(0);
+        myBooks.add(book);
+        accountCustomData.put("books", myBooks);
+        accountCustomData.save();
     }
 
     @PreAuthorize("hasRole(@roles.GROUP_USER)")
     public void upvote(CustomData accountCustomData, CustomData groupCustomData, Book book) {
-        List<Book> books = getBooksFromCustomData(accountCustomData);
+        List<Book> myBooks = getBooksFromCustomData(accountCustomData);
+        List<Book> groupBooks = getBooksFromCustomData(groupCustomData);
+        int foundIndex;
 
-        // shouldn't get here if they've already upvoted
-        if (books.contains(book)) { return; }
-
-        books.add(book);
-        accountCustomData.put("books", books);
-        accountCustomData.save();
-
-        books = getBooksFromCustomData(groupCustomData);
-        int foundIndex = books.indexOf(book);
-        if (foundIndex >= 0) {
-            Book foundBook = books.get(foundIndex);
-            foundBook.setVotes(foundBook.getVotes()+1);
-            groupCustomData.put("books", books);
-            groupCustomData.save();
+        // shouldn't get here if the book doesn't exist or if they've already upvoted
+        if (
+            groupBooks == null ||
+            (foundIndex = groupBooks.indexOf(book)) < 0 ||
+            myBooks.contains(book)
+        ) {
+            return;
         }
+
+        // save to Group CustomData
+        Book foundBook = groupBooks.get(foundIndex);
+        foundBook.setVotes(foundBook.getVotes()+1);
+        groupCustomData.put("books", groupBooks);
+        groupCustomData.save();
+
+        // save to Account CustomData
+        // votes are ignored at the account level, but let's keep it 0
+        foundBook.setVotes(0);
+        myBooks.add(foundBook);
+        accountCustomData.put("books", myBooks);
+        accountCustomData.save();
     }
 
     @PreAuthorize("hasRole(@roles.GROUP_ADMIN)")
@@ -144,10 +156,9 @@ public class BookService {
                 book.setAuthor((String) bookMap.get("author"));
                 book.setTitle((String) bookMap.get("title"));
                 book.setUrl((String) bookMap.get("url"));
-                // only group custom data has vote count
-                if (bookMap.get("votes") != null) {
-                    book.setVotes((Integer)bookMap.get("votes"));
-                }
+
+                book.setOwner((String) bookMap.get("owner"));
+                book.setVotes((Integer) bookMap.get("votes"));
                 books.add(book);
             }
         }

@@ -53,7 +53,7 @@
                     <!--/* displayed if account IS null, indicating that the user IS NOT logged in */-->
                     <div th:unless="${account}">
                         <h1>Who are you?</h1>
-                        <a th:href="@{/login}" class="btn btn-success">Login</a>
+                        <a th:href="@{/login}" class="btn btn-success">Login or Create Account</a>
                     </div>
 
                     <hr/>
@@ -76,7 +76,8 @@
                                         <th class="col-md-1 text-center">Up Vote</th>
                                         <th class="col-md-1 text-center">Votes</th>
                                         <th class="col-md-2">Author</th>
-                                        <th class="col-md-5">Book</th>
+                                        <th class="col-md-2">Title</th>
+                                        <th class="col-md-2">Posted By</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -96,6 +97,7 @@
                                             <a th:href="${bookDatum.book.url}" th:text="${bookDatum.book.title}" target="_blank"/>
                                         </td>
                                         <td th:unless="${bookDatum.book.url}" th:text="${bookDatum.book.title}"/>
+                                        <td th:text="${bookDatum.book.owner}"/>
                                     </tr>
                                 </tbody>
                             </table>

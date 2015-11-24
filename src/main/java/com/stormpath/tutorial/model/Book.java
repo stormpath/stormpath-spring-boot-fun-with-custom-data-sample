@@ -21,6 +21,8 @@ public class Book {
     String author;
     String title;
     String url;
+
+    String owner;
     int votes;
 
     public String getAuthor() {
@@ -53,6 +55,14 @@ public class Book {
 
     public void setVotes(int votes) {
         this.votes = votes;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     @JsonIgnore
