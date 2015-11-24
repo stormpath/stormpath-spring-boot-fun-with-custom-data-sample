@@ -39,7 +39,7 @@ import java.util.List;
 @Controller
 public class BooksController {
 
-    @Value("#{ @environment['stormpath.authorized.group.user'] }")
+    @Value("#{ @environment['stormpath.authorized.group.user.href'] }")
     private String userGroupHref;
 
     @Value("#{ @environment['stormpath.web.msg.rebuilt_book_list'] ?: 'You successfully rebuilt the book list' }")

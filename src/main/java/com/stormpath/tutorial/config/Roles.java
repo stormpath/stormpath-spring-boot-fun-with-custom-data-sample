@@ -26,7 +26,7 @@ public class Roles {
 
     @Autowired
     public Roles(Environment env) {
-        GROUP_USER = env.getProperty("stormpath.authorized.group.user");
-        GROUP_ADMIN = env.getProperty("stormpath.authorized.group.admin");
+        GROUP_USER = env.getProperty("stormpath.authorized.group.user.href");
+        GROUP_ADMIN = env.getProperty("stormpath.authorized.group.admin.href");
     }
 }

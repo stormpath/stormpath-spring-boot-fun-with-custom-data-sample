@@ -36,12 +36,8 @@ import java.util.TreeSet;
 
 @Service
 public class BookService {
-    @Value("#{ @environment['stormpath.authorized.group.user'] }")
+    @Value("#{ @environment['stormpath.authorized.group.user.href'] }")
     private String userGroupHref;
-
-    @Value("#{ @environment['stormpath.authorized.group.admin'] }")
-    private String adminGroupHref;
-
 
     @PreAuthorize("hasRole(@roles.GROUP_USER)")
     public void newBook(CustomData accountCustomData, CustomData groupCustomData, Book book) {

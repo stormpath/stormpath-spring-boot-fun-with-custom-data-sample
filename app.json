@@ -1,0 +1,29 @@
+{
+  "name": "Fun with CustomData",
+  "description": "Using CustomData, we can create a no database application",
+  "repository": "https://github.com/stormpath/fun-with-custom-data-sample/tree/master",
+  "keywords": ["spring boot", "identity", "security", "authentication"],
+  "success_url": "/",
+  "env": {
+    "STORMPATH_API_KEY_ID": {
+      "description": "The API key ID from your ~/.stormpath/apiKey.properties file",
+      "value": "changeme"
+    },
+    "STORMPATH_API_KEY_SECRET": {
+      "description": "The API key secret from tyou ~/.stormpath/apiKey.properties file",
+      "value": "changeme"
+    },
+    "STORMPATH_APPLICATION_HREF": {
+      "description": "The URL for your Stormpath Application from the Stormpath Admin Dashboard",
+      "value": "changeme"
+    },
+    "STORMPATH_AUTHORIZED_GROUP_USER_HREF": {
+      "description": "The URL for your Stormpath User Group from the Stormpath Admin Dashboard",
+      "value": "changeme"
+    },
+    "STORMPATH_AUTHORIZED_GROUP_ADMIN_HREF": {
+      "description": "The URL for your Stormpath Admin Group from the Stormpath Admin Dashboard",
+      "value": "changeme"
+    }
+  }
+}

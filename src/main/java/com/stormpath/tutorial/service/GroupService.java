@@ -23,10 +23,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GroupService {
-    @Value("#{ @environment['stormpath.authorized.group.user'] }")
+    @Value("#{ @environment['stormpath.authorized.group.user.href'] }")
     private String userGroupHref;
 
-    @Value("#{ @environment['stormpath.authorized.group.admin'] }")
+    @Value("#{ @environment['stormpath.authorized.group.admin.href'] }")
     private String adminGroupHref;
 
     @Autowired
