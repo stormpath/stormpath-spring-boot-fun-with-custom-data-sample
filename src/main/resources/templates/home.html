@@ -29,7 +29,7 @@
                     <div th:if="${account}">
                         <h1 th:inline="text">Hello, [[${account.fullName}]]!</h1>
 
-                        <form th:action="@{/new_book}" th:object="${book}" method="post" class="form-inline">
+                        <form th:if="${isInUserGroup}" th:action="@{/new_book}" th:object="${book}" method="post" class="form-inline">
                             <div class="form-group">
                                 <label for="author">Author</label>
                                 <input type="text" th:field="*{author}" class="form-control" id="author" placeholder="Author"/>
@@ -45,7 +45,8 @@
                             <button type="submit" class="btn btn-success">New Book</button>
                         </form>
 
-                        <a th:if="${isAdmin}" th:href="@{/admin}" class="btn btn-primary">Rebuild Book List</a>
+                        <a th:if="${isInAdminGroup}" th:href="@{/admin}" class="btn btn-primary">Rebuild Book List</a>
+                        <a th:if="${!isInUserGroup}" th:href="@{/join_user_group}" class="btn btn-primary">Join User Group</a>
                         <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
                     </div>
 

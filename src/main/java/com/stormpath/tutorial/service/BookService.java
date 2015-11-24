@@ -78,10 +78,6 @@ public class BookService {
         }
     }
 
-    public boolean isAdmin(Account account) {
-        return (account != null && account.isMemberOfGroup(adminGroupHref));
-    }
-
     public List<BookDatum> getBookData(Account account, List<Book> allBooks, List<Book> myBooks) {
         List<BookDatum> bookData = new ArrayList<BookDatum>();
         if (allBooks != null) {

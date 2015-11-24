@@ -23,6 +23,7 @@ import com.stormpath.sdk.servlet.client.ClientResolver;
 import com.stormpath.tutorial.model.Book;
 import com.stormpath.tutorial.model.BookDatum;
 import com.stormpath.tutorial.service.BookService;
+import com.stormpath.tutorial.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -43,18 +44,19 @@ public class BooksController {
     @Autowired
     private BookService bookService;
 
+    @Autowired
+    private GroupService groupService;
+
     @RequestMapping("/")
     String home(HttpServletRequest req, Model model) {
         Account account = AccountResolver.INSTANCE.getAccount(req);
-        List<Book> allBooks = getBooksFromGroupCustomData(req);
-        List<Book> myBooks = getBooksFromAccountCustomData(req);
-        List<BookDatum> bookData = bookService.getBookData(account, allBooks, myBooks);
-        boolean isAdmin = bookService.isAdmin(account);
 
-        model.addAttribute("status", req.getParameter("status"));
-        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("isInAdminGroup", groupService.isInAdminGroup(account));
+        model.addAttribute("isInUserGroup", groupService.isInUserGroup(account));
+
         model.addAttribute("book", new Book());
-        model.addAttribute("bookData", bookData);
+        model.addAttribute("bookData", getBookData(req));
+        model.addAttribute("status", req.getParameter("status"));
 
         return "home";
     }
@@ -73,10 +75,28 @@ public class BooksController {
         return "redirect:/";
     }
 
+    @RequestMapping("/join_user_group")
+    String joinGroup(HttpServletRequest req) {
+        Account account = AccountResolver.INSTANCE.getAccount(req);
+
+        groupService.joinUserGroup(account);
+
+        return "redirect:/logout";
+    }
+
     // not implemented yet
     @RequestMapping("/admin")
     String admin(HttpServletRequest req, Model model) {
         return "redirect:/";
+    }
+
+    private List<BookDatum> getBookData(HttpServletRequest req) {
+        Account account = AccountResolver.INSTANCE.getAccount(req);
+
+        List<Book> allBooks = getBooksFromGroupCustomData(req);
+        List<Book> myBooks = getBooksFromAccountCustomData(req);
+
+        return bookService.getBookData(account, allBooks, myBooks);
     }
 
     private List<Book> getBooksFromGroupCustomData(HttpServletRequest req) {
