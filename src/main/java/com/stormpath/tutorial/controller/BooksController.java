@@ -88,7 +88,7 @@ public class BooksController {
 
         groupService.joinUserGroup(account);
 
-        return "redirect:/logout";
+        return "redirect:/";
     }
 
     @RequestMapping("/rebuild_book_list")

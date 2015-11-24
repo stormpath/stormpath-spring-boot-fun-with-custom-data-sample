@@ -19,7 +19,15 @@ import com.stormpath.sdk.account.Account;
 import com.stormpath.spring.security.provider.StormpathAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class GroupService {
@@ -43,6 +51,15 @@ public class GroupService {
     public void joinUserGroup(Account account) {
         if (account != null && !isInUserGroup(account)) {
             account.addGroup(userGroupHref);
+            refreshGrantedAuthorities(account);
         }
+    }
+
+    public void refreshGrantedAuthorities(Account account) {
+        // Make Spring Security recognize! Maybe not best practice?
+        Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(userGroupHref));
+        Authentication authentication = new UsernamePasswordAuthenticationToken(account.getEmail(), null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

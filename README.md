@@ -116,13 +116,7 @@ with a ridiculous number of books. I'll keep you posted.
 
 ## Known Issues
 
-1. Spring Security only loads Granted Authorities (Stormpath Groups, in this case) when you log in. So, when you add
-yourself to the User Group, Spring Security does not know that you are in the Group. 
-
-    The workaround is that as soon as you are added to the Stormpath User Group, the app logs you out and forces you 
-    to log in again.
-
-2. There's an issue with Spring Security and creating a new Account when email verification is turned off.
+1. There's an issue with Spring Security and creating a new Account when email verification is turned off.
 
      You can define Account Registration & Verification workflows in the Directory attached to your Stormpath Application.
 
@@ -135,4 +129,4 @@ yourself to the User Group, Spring Security does not know that you are in the Gr
      The workaround is to enable the Verification Email in the Stormpath Admin Console for the Directory associated with
      your Application.
      
-Both of these issues will be addressed in a upcoming release and this README will be updated then.
+This issue will be addressed in a upcoming release and this README will be updated then.
