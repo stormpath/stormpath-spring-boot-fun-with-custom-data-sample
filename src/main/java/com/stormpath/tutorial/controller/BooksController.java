@@ -42,6 +42,10 @@ public class BooksController {
     @Value("#{ @environment['stormpath.authorized.group.user'] }")
     private String userGroupHref;
 
+    @Value("#{ @environment['stormpath.web.msg.rebuilt_book_list'] ?: 'You successfully rebuilt the book list' }")
+    private String rebuiltBookListMsg;
+
+
     @Autowired
     private BookService bookService;
 
@@ -85,14 +89,15 @@ public class BooksController {
         return "redirect:/logout";
     }
 
-    @RequestMapping("/admin")
-    String admin(HttpServletRequest req) {
+    @RequestMapping("/rebuild_book_list")
+    String rebuildBookList(HttpServletRequest req, Model model) {
         bookService.rebuildBookData(
             ApplicationResolver.INSTANCE.getApplication(req),
             getGroupCustomData(req)
         );
 
-        return "redirect:/";
+        model.addAttribute("msg", rebuiltBookListMsg);
+        return home(req, model);
     }
 
     private List<BookDatum> getBookData(HttpServletRequest req) {
