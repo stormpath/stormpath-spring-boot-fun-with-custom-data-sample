@@ -19,6 +19,7 @@ import com.stormpath.sdk.account.Account;
 import com.stormpath.sdk.client.Client;
 import com.stormpath.sdk.directory.CustomData;
 import com.stormpath.sdk.servlet.account.AccountResolver;
+import com.stormpath.sdk.servlet.application.ApplicationResolver;
 import com.stormpath.sdk.servlet.client.ClientResolver;
 import com.stormpath.tutorial.model.Book;
 import com.stormpath.tutorial.model.BookDatum;
@@ -84,9 +85,13 @@ public class BooksController {
         return "redirect:/logout";
     }
 
-    // not implemented yet
     @RequestMapping("/admin")
-    String admin(HttpServletRequest req, Model model) {
+    String admin(HttpServletRequest req) {
+        bookService.rebuildBookData(
+            ApplicationResolver.INSTANCE.getApplication(req),
+            getGroupCustomData(req)
+        );
+
         return "redirect:/";
     }
 

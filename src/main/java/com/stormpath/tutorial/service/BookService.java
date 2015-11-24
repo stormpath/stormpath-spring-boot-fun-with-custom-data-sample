@@ -16,6 +16,10 @@
 package com.stormpath.tutorial.service;
 
 import com.stormpath.sdk.account.Account;
+import com.stormpath.sdk.account.AccountCriteria;
+import com.stormpath.sdk.account.AccountList;
+import com.stormpath.sdk.account.Accounts;
+import com.stormpath.sdk.application.Application;
 import com.stormpath.sdk.directory.CustomData;
 import com.stormpath.tutorial.model.Book;
 import com.stormpath.tutorial.model.BookDatum;
@@ -76,6 +80,29 @@ public class BookService {
             groupCustomData.put("books", books);
             groupCustomData.save();
         }
+    }
+
+    @PreAuthorize("hasRole(@roles.GROUP_ADMIN)")
+    public void rebuildBookData(Application application, CustomData groupCustomData) {
+        List<Book> books = new ArrayList<Book>();
+
+        AccountCriteria criteria = Accounts.criteria().withCustomData().withGroups();
+        AccountList accountList = application.getAccounts(criteria);
+        for (Account account : accountList) {
+            List<Book> accountBooks = getBooksFromCustomData(account.getCustomData());
+            for (Book book : accountBooks) {
+                int index;
+                if ((index = books.indexOf(book)) >= 0) {
+                    Book foundBook = books.get(index);
+                    foundBook.setVotes(foundBook.getVotes()+1);
+                } else {
+                    book.setVotes(1);
+                    books.add(book);
+                }
+            }
+        }
+        groupCustomData.put("books", books);
+        groupCustomData.save();
     }
 
     public List<BookDatum> getBookData(Account account, List<Book> allBooks, List<Book> myBooks) {
