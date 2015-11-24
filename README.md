@@ -67,30 +67,6 @@ We're going to use a particular key so as not to interfere with any other `Custo
       "title": "Snow Crash",
       "url": "http://www.amazon.com/Snow-Crash-Neal-Stephenson/dp/0553380958/ref=sr_1_1?ie=UTF8&qid=1447677686&sr=8-1&keywords=snow+crash",
       "votes": 3
-    },
-    {
-      "author": "Robert Heinlein",
-      "title": "Stranger in a Strange Land",
-      "url": "http://www.amazon.com/Stranger-Strange-Land-Remembering-Tomorrow/dp/0441790348/ref=sr_1_1?ie=UTF8&qid=1448304063&sr=8-1&keywords=stranger+in+a+strange+land",
-      "votes": 3
-    },
-    {
-      "author": "Neal Stephenson",
-      "title": "The Diamond Age",
-      "url": "http://www.amazon.com/Diamond-Age-Illustrated-Primer-Spectra/dp/0553380966/ref=sr_1_1?ie=UTF8&qid=1447682975&sr=8-1&keywords=the+diamond+age",
-      "votes": 3
-    },
-    {
-      "author": "Andy Weir",
-      "title": "The Martian",
-      "url": "http://www.amazon.com/Martian-Andy-Weir/dp/0553418025/ref=sr_1_1?ie=UTF8&qid=1447677656&sr=8-1&keywords=the+martian",
-      "votes": 3
-    },
-    {
-      "author": "L. Frank Baum",
-      "title": "The Wonderful Wizard of Oz",
-      "url": "http://www.amazon.com/The-Wonderful-Wizard-Oz-Commemorative/dp/0689817517?ref=spkl_1_0_2279092822&qid=1447826537&pf_rd_p=2279092822&pf_rd_m=ATVPDKIKX0DER&pf_rd_t=301&pf_rd_s=desktop-auto-sparkle&pf_rd_r=0M79F14H25J9FA53Y89C&pf_rd_i=science+fiction+best+sellers",
-      "votes": 2
     }
   ]
 }
@@ -137,3 +113,26 @@ It's not a SPA (Single Page Application). Making an Angular app out of it would 
 It's not meant to have tons of data. It should be very responsive with a couple of hundred books. It may start to
 become less responsive if you have thousands of books. Maybe I'll do a little stress testing to see how it performs
 with a ridiculous number of books. I'll keep you posted.
+
+## Known Issues
+
+1. Spring Security only loads Granted Authorities (Stormpath Groups, in this case) when you log in. So, when you add
+yourself to the User Group, Spring Security does not know that you are in the Group. 
+
+    The workaround is that as soon as you are added to the Stormpath User Group, the app logs you out and forces you 
+    to log in again.
+
+2. There's an issue with Spring Security and creating a new Account when email verification is turned off.
+
+     You can define Account Registration & Verification workflows in the Directory attached to your Stormpath Application.
+
+     One of these workflows is Verification Email. That is, when a user creates an Account for your application, they will
+     get an email with a link in it to verify their Account. By default, this is turned off.
+     
+     Under these conditions, when you create an Account, you are immediately logged in to the Application. Only, the
+     Stormpath Spring Security integration is not properly handling that login event, so it doesn't know you've authenticated.
+     
+     The workaround is to enable the Verification Email in the Stormpath Admin Console for the Directory associated with
+     your Application.
+     
+Both of these issues will be addressed in a upcoming release and this README will be updated then.
