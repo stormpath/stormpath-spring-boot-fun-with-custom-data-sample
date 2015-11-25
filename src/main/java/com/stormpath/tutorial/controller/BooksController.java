@@ -22,7 +22,6 @@ import com.stormpath.sdk.servlet.account.AccountResolver;
 import com.stormpath.sdk.servlet.application.ApplicationResolver;
 import com.stormpath.sdk.servlet.client.ClientResolver;
 import com.stormpath.tutorial.model.Book;
-import com.stormpath.tutorial.model.BookDatum;
 import com.stormpath.tutorial.service.BookService;
 import com.stormpath.tutorial.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,12 +55,14 @@ public class BooksController {
     String home(HttpServletRequest req, Model model) {
         Account account = AccountResolver.INSTANCE.getAccount(req);
 
+        model.addAttribute("status", req.getParameter("status"));
+
         model.addAttribute("isInAdminGroup", groupService.isInAdminGroup(account));
         model.addAttribute("isInUserGroup", groupService.isInUserGroup(account));
 
         model.addAttribute("book", new Book());
-        model.addAttribute("bookData", getBookData(req));
-        model.addAttribute("status", req.getParameter("status"));
+        model.addAttribute("allBooks", getBooksFromGroupCustomData(req));
+        model.addAttribute("myBooks", getBooksFromAccountCustomData(req));
 
         return "home";
     }
@@ -100,15 +101,6 @@ public class BooksController {
 
         model.addAttribute("msg", rebuiltBookListMsg);
         return home(req, model);
-    }
-
-    private List<BookDatum> getBookData(HttpServletRequest req) {
-        Account account = AccountResolver.INSTANCE.getAccount(req);
-
-        List<Book> allBooks = getBooksFromGroupCustomData(req);
-        List<Book> myBooks = getBooksFromAccountCustomData(req);
-
-        return bookService.getBookData(account, allBooks, myBooks);
     }
 
     private List<Book> getBooksFromGroupCustomData(HttpServletRequest req) {

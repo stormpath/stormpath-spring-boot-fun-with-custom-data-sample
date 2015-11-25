@@ -68,7 +68,7 @@
                     </div>
 
                     <!--/* Always show the book list, if available */-->
-                    <div th:if="${#lists.size(bookData)}">
+                    <div th:if="${#lists.size(allBooks)}">
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <thead>
@@ -81,23 +81,26 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="bookDatum : ${bookData}">
-                                        <td class="text-center" th:if="${bookDatum.canUpVote}">
+                                    <tr
+                                        th:each="book : ${allBooks}"
+                                        th:with="canUpVote=${account != null and not #lists.contains(myBooks, book)}"
+                                    >
+                                        <td class="text-center" th:if="${canUpVote}">
                                             <form class="stormpath-hidden-form" th:action="@{/upvote}" method="post">
-                                                <input name="author" th:value="${bookDatum.book.author}" type="hidden"/>
-                                                <input name="title" th:value="${bookDatum.book.title}" type="hidden"/>
-                                                <input name="url" th:value="${bookDatum.book.url}" type="hidden"/>
+                                                <input name="author" th:value="${book.author}" type="hidden"/>
+                                                <input name="title" th:value="${book.title}" type="hidden"/>
+                                                <input name="url" th:value="${book.url}" type="hidden"/>
                                                 <a href="#" onclick="$(this).closest('form').submit()"><i class="fa fa-arrow-up"></i></a>
                                             </form>
                                         </td>
-                                        <td class="text-center" th:unless="${bookDatum.canUpVote}">&nbsp;</td>
-                                        <td class="text-center" th:text="${bookDatum.book.votes}"/>
-                                        <td th:text="${bookDatum.book.author}"/>
-                                        <td th:if="${bookDatum.book.url}">
-                                            <a th:href="${bookDatum.book.url}" th:text="${bookDatum.book.title}" target="_blank"/>
+                                        <td class="text-center" th:unless="${canUpVote}">&nbsp;</td>
+                                        <td class="text-center" th:text="${book.votes}"/>
+                                        <td th:text="${book.author}"/>
+                                        <td th:if="${book.url}">
+                                            <a th:href="${book.url}" th:text="${book.title}" target="_blank"/>
                                         </td>
-                                        <td th:unless="${bookDatum.book.url}" th:text="${bookDatum.book.title}"/>
-                                        <td th:text="${bookDatum.book.owner}"/>
+                                        <td th:unless="${book.url}" th:text="${book.title}"/>
+                                        <td th:text="${book.owner}"/>
                                     </tr>
                                 </tbody>
                             </table>

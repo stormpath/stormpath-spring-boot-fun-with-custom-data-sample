@@ -22,8 +22,6 @@ import com.stormpath.sdk.account.Accounts;
 import com.stormpath.sdk.application.Application;
 import com.stormpath.sdk.directory.CustomData;
 import com.stormpath.tutorial.model.Book;
-import com.stormpath.tutorial.model.BookDatum;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +34,6 @@ import java.util.TreeSet;
 
 @Service
 public class BookService {
-    @Value("#{ @environment['stormpath.authorized.group.user.href'] }")
-    private String userGroupHref;
 
     @PreAuthorize("hasRole(@roles.GROUP_USER)")
     public void newBook(CustomData accountCustomData, CustomData groupCustomData, Book book) {
@@ -113,26 +109,6 @@ public class BookService {
         groupCustomData.save();
     }
 
-    public List<BookDatum> getBookData(Account account, List<Book> allBooks, List<Book> myBooks) {
-        List<BookDatum> bookData = new ArrayList<BookDatum>();
-        if (allBooks != null) {
-            for (Book book : allBooks) {
-                BookDatum bookDatum = new BookDatum();
-                bookDatum.setBook(book);
-                if (
-                    account != null && account.isMemberOfGroup(userGroupHref) &&
-                    myBooks != null && !myBooks.contains(book)
-                ) {
-                    bookDatum.setCanUpVote(true);
-                } else {
-                    bookDatum.setCanUpVote(false);
-                }
-                bookData.add(bookDatum);
-            }
-        }
-        return bookData;
-    }
-
     public List<Book> getBooksFromCustomData(CustomData customData) {
         if (customData == null || customData.get("books") == null) {
             return new ArrayList<Book>();
@@ -164,4 +140,5 @@ public class BookService {
         }
         return new ArrayList<Book>(books);
     }
+
 }
