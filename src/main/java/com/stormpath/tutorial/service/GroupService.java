@@ -51,15 +51,13 @@ public class GroupService {
     public void joinUserGroup(Account account) {
         if (account != null && !isInUserGroup(account)) {
             account.addGroup(userGroupHref);
-            refreshGrantedAuthorities(account);
+
+            // Make Spring Security recognize! Maybe not best practice?
+            Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+            authorities.add(new SimpleGrantedAuthority(userGroupHref));
+            Authentication authentication = new UsernamePasswordAuthenticationToken(account.getEmail(), null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
     }
 
-    public void refreshGrantedAuthorities(Account account) {
-        // Make Spring Security recognize! Maybe not best practice?
-        Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority(userGroupHref));
-        Authentication authentication = new UsernamePasswordAuthenticationToken(account.getEmail(), null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
 }
