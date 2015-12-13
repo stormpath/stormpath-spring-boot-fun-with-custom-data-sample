@@ -119,12 +119,8 @@ public class BooksController {
     }
 
     private CustomData getAccountCustomData(HttpServletRequest req) {
-        Client client = ClientResolver.INSTANCE.getClient(req);
         Account account = AccountResolver.INSTANCE.getAccount(req);
-        CustomData customData = null;
-        if (account != null) {
-            customData = client.getResource(account.getCustomData().getHref(), CustomData.class);
-        }
-        return customData;
+        if (account == null) { return null; }
+        return account.getCustomData();
     }
 }
