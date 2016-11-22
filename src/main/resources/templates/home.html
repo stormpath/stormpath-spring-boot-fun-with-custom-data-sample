@@ -45,9 +45,11 @@
                             <button type="submit" class="btn btn-success">New Book</button>
                         </form>
 
-                        <a th:if="${isInAdminGroup}" th:href="@{/rebuild_book_list}" class="btn btn-primary">Rebuild Book List</a>
-                        <a th:if="${!isInUserGroup}" th:href="@{/join_user_group}" class="btn btn-primary">Join User Group</a>
-                        <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
+                        <form th:action="@{/logout}" method="post">
+                            <a th:if="${isInAdminGroup}" th:href="@{/rebuild_book_list}" class="btn btn-primary">Rebuild Book List</a>
+                            <a th:if="${!isInUserGroup}" th:href="@{/join_user_group}" class="btn btn-primary">Join User Group</a>
+                            <input type="submit" class="btn btn-danger" value="Logout"/>
+                        </form>
                     </div>
 
                     <!--/* displayed if account IS null, indicating that the user IS NOT logged in */-->
