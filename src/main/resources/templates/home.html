@@ -21,13 +21,9 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="box col-md-12">
-                    <div class="stormpath-header">
-                        <img src="https://stormpath.com/images/template/logo-nav.png"/>
-                    </div>
-
                     <!--/* displayed if account IS NOT null, indicating that the user IS logged in */-->
                     <div th:if="${account}">
-                        <h1 th:inline="text">Hello, [[${account.fullName}]]!</h1>
+                        <h1 th:inline="text">Hello, [[${account.fullName}]]! (Groups: [[${groups}]])</h1>
 
                         <form th:if="${isInUserGroup}" th:action="@{/new_book}" th:object="${book}" method="post" class="form-inline">
                             <div class="form-group">
@@ -45,7 +41,7 @@
                             <button type="submit" class="btn btn-success">New Book</button>
                         </form>
 
-                        <form th:action="@{/logout}" method="post">
+                        <form th:action="@{/logout}" method="post" class="nav">
                             <a th:if="${isInAdminGroup}" th:href="@{/rebuild_book_list}" class="btn btn-primary">Rebuild Book List</a>
                             <a th:if="${!isInUserGroup}" th:href="@{/join_user_group}" class="btn btn-primary">Join User Group</a>
                             <input type="submit" class="btn btn-danger" value="Logout"/>

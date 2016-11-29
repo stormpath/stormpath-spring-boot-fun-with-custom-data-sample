@@ -57,8 +57,21 @@ public class BooksController {
 
         model.addAttribute("status", req.getParameter("status"));
 
-        model.addAttribute("isInAdminGroup", groupService.isInAdminGroup(account));
-        model.addAttribute("isInUserGroup", groupService.isInUserGroup(account));
+        boolean isInAdminGroup = groupService.isInAdminGroup(account);
+        boolean isInUserGroup = groupService.isInUserGroup(account);
+        String groups;
+        if (isInUserGroup || isInAdminGroup) {
+            if (isInUserGroup && isInAdminGroup) {
+                groups = "user, admin";
+            } else {
+                groups = (isInUserGroup) ? "user" : "admin";
+            }
+        } else {
+            groups = "NONE";
+        }
+        model.addAttribute("isInAdminGroup", isInAdminGroup);
+        model.addAttribute("isInUserGroup", isInUserGroup);
+        model.addAttribute("groups", groups);
 
         model.addAttribute("book", new Book());
         model.addAttribute("allBooks", getBooksFromGroupCustomData(req));
